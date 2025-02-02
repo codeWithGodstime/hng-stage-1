@@ -50,10 +50,6 @@ async def classify_number(number: int = Query(..., description="The number to cl
         
         if is_armstrong(number):
             properties.append("armstrong")
-        if is_prime(number):
-            properties.append("prime")
-        if is_perfect(number):
-            properties.append("perfect")
 
         return {
             "number": number,
@@ -64,7 +60,7 @@ async def classify_number(number: int = Query(..., description="The number to cl
             "fun_fact": get_fun_fact(number),
         }
     except Exception:
-        return {"number": number, "error": True}
+        return {"number": "alphabet", "error": true}
 
 
 if __name__ == "__main__":
