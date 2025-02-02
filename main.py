@@ -43,13 +43,14 @@ def get_fun_fact(n: int) -> str:
 async def classify_number(number: int = Query(..., description="The number to classify")):
     try:
         properties = []
+
+        if is_armstrong(number):
+            properties.append("armstrong")
+
         if number % 2 == 0:
             properties.append("even")
         else:
             properties.append("odd")
-        
-        if is_armstrong(number):
-            properties.append("armstrong")
 
         return {
             "number": number,
@@ -60,7 +61,7 @@ async def classify_number(number: int = Query(..., description="The number to cl
             "fun_fact": get_fun_fact(number),
         }
     except Exception:
-        return {"number": "alphabet", "error": true}
+        return {"number": "alphabet", "error": True}
 
 
 if __name__ == "__main__":
