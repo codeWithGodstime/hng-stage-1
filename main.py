@@ -47,7 +47,7 @@ async def classify_number(number = Query(..., description="The number to classif
 
     if not number.isdigit():
         response.status_code = 400
-        return {"number": "alphabet", "error": True}
+        return {"number": str('f'), "error": True}
 
     number = int(number)
     if is_armstrong(number):
