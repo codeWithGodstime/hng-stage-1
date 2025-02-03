@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 import math
 import requests
@@ -32,7 +33,7 @@ def is_armstrong(n: int) -> bool:
 
 def get_fun_fact(n: int) -> str:
     try:
-        response = requests.get(f"http://numbersapi.com/{n}", timeout=5)
+        response = requests.get(f"http://numbersapi.com/{n}/math", timeout=5)
         if response.status_code == 200:
             return response.text
     except requests.RequestException:
@@ -40,28 +41,31 @@ def get_fun_fact(n: int) -> str:
     return "Fun fact not available."
 
 @app.get("/api/classify-number")
-async def classify_number(number: int = Query(..., description="The number to classify")):
-    try:
-        properties = []
+async def classify_number(number = Query(..., description="The number to classify"),  response: Response = None):
 
-        if is_armstrong(number):
-            properties.append("armstrong")
+    properties = []
 
-        if number % 2 == 0:
-            properties.append("even")
-        else:
-            properties.append("odd")
-
-        return {
-            "number": number,
-            "is_prime": is_prime(number),
-            "is_perfect": is_perfect(number),
-            "properties": properties,
-            "digit_sum": sum(int(d) for d in str(number)),
-            "fun_fact": get_fun_fact(number),
-        }
-    except Exception:
+    if not number.isdigit():
+        response.status_code = 400
         return {"number": "alphabet", "error": True}
+
+    number = int(number)
+    if is_armstrong(number):
+        properties.append("armstrong")
+
+    if number % 2 == 0:
+        properties.append("even")
+    else:
+        properties.append("odd")
+
+    return {
+        "number": number,
+        "is_prime": is_prime(number),
+        "is_perfect": is_perfect(number),
+        "properties": properties,
+        "digit_sum": sum(int(d) for d in str(number)),
+        "fun_fact": get_fun_fact(number),
+    }
 
 
 if __name__ == "__main__":
