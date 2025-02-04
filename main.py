@@ -1,5 +1,4 @@
-from fastapi import FastAPI, Query, HTTPException
-from fastapi.responses import Response
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import math
 import requests
@@ -15,6 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 def is_prime(n: int) -> bool:
     if n < 2:
         return False
@@ -23,13 +23,20 @@ def is_prime(n: int) -> bool:
             return False
     return True
 
+
 def is_perfect(n: int) -> bool:
+    if n <= 0:
+        return False
     return n == sum(i for i in range(1, n) if n % i == 0)
 
+
 def is_armstrong(n: int) -> bool:
+    if n < 0:
+        return False
     digits = [int(digit) for digit in str(n)]
     power = len(digits)
     return sum(d ** power for d in digits) == n
+
 
 def get_fun_fact(n: int) -> str:
     try:
@@ -40,16 +47,23 @@ def get_fun_fact(n: int) -> str:
         return "Fun fact not available at the moment."
     return "Fun fact not available."
 
-@app.get("/api/classify-number")
-async def classify_number(number:int = Query(..., description="The number to classify"),  response: Response = None):
 
+@app.get("/api/classify-number")
+async def classify_number(
+    number: int = Query(..., description="The number to classify"),
+):
     properties = []
 
-    # if not number.isdigit():
-    #     response.status_code = 400
-    #     return {"number": number, "error": True}
+    if number < 0:
+        return {
+            "number": number,
+            "is_prime": False, 
+            "is_perfect": False,
+            "properties": ["even" if number % 2 == 0 else "odd"],
+            "digit_sum": sum(int(d) for d in str(abs(number))),
+            "fun_fact": get_fun_fact(number),
+        }
 
-    number = int(number)
     if is_armstrong(number):
         properties.append("armstrong")
 
@@ -63,7 +77,7 @@ async def classify_number(number:int = Query(..., description="The number to cla
         "is_prime": is_prime(number),
         "is_perfect": is_perfect(number),
         "properties": properties,
-        "digit_sum": sum(int(d) for d in str(number)),
+        "digit_sum": sum(int(d) for d in str(abs(number))),  # Fixed sum calculation
         "fun_fact": get_fun_fact(number),
     }
 
