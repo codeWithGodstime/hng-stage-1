@@ -41,13 +41,13 @@ def get_fun_fact(n: int) -> str:
     return "Fun fact not available."
 
 @app.get("/api/classify-number")
-async def classify_number(number = Query(..., description="The number to classify"),  response: Response = None):
+async def classify_number(number:int = Query(..., description="The number to classify"),  response: Response = None):
 
     properties = []
 
-    if not number.isdigit():
-        response.status_code = 400
-        return {"number": number, "error": True}
+    # if not number.isdigit():
+    #     response.status_code = 400
+    #     return {"number": number, "error": True}
 
     number = int(number)
     if is_armstrong(number):
